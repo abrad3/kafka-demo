@@ -1,27 +1,32 @@
 # from https://elkhayati.me/kafka-python-twitter/
-from tweepy.streaming import StreamListener
-from tweepy import OAuthHandler
+from tweepy.streaming import Stream
 from tweepy import Stream
 from kafka import KafkaProducer
-import json
 
 access_token = os.getenv('ACCESS_TOKEN') 
 access_token_secret = os.getenv('ACCESS_TOKEN_SECRET')
 api_key =  os.getenv('API_KEY')
 api_secret = os.getenv('API_SECRET')
 
-class StdOutListener(StreamListener):
-    def on_data(self, data):
-        json_ = json.loads(data) 
-        producer.send("basic", json_["text"].encode('utf-8'))
-        return True
-    def on_error(self, status):
-        print (status)
+class StdOutListener(Stream):
+    def on_status(self, status):
+      if hasattr(status, "retweeted_status"):  # Check if Retweet
+        try:
+            data=status.retweeted_status.extended_tweet["full_text"]
+            print(data)
+        except AttributeError:
+            data=status.retweeted_status.text
+            print(data)
+      else:
+        try:
+            data=status.extended_tweet["full_text"]
+            print(data)
+        except AttributeError:
+            data=status.text
+            print(data)
+      producer.send("test-topic", data.encode('utf-8'))
+      return True
 
-producer = KafkaProducer(bootstrap_servers='localhost:9092')
-l = StdOutListener()
-auth = OAuthHandler(api_key, api_secret)
-auth.set_access_token(access_token, access_token_secret)
-stream = Stream(auth, l)
-keyword = os.getenv('KEYWORD')
-stream.filter([keyword])
+producer = KafkaProducer(bootstrap_servers='192.168.122.8:30412')
+l = StdOutListener(api_key, api_secret, access_token, access_token_secret)
+l.filter(track=["#cat", "puppy"], filter_level="low")
