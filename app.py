@@ -29,4 +29,4 @@ class StdOutListener(Stream):
 
 producer = KafkaProducer(bootstrap_servers='192.168.122.8:30412')
 l = StdOutListener(api_key, api_secret, access_token, access_token_secret)
-l.filter(track=["#cat", "puppy"], filter_level="low")
+l.filter(track=["#cat"], filter_level="low")
