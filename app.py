@@ -1,4 +1,5 @@
 # from https://elkhayati.me/kafka-python-twitter/
+import os
 from tweepy.streaming import Stream
 from tweepy import Stream
 from kafka import KafkaProducer
