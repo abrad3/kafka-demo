@@ -27,6 +27,6 @@ class StdOutListener(Stream):
       producer.send("test-topic", data.encode('utf-8'))
       return True
 
-producer = KafkaProducer(bootstrap_servers='192.168.122.8:30412')
+producer = KafkaProducer(bootstrap_servers='XXX:30412')
 l = StdOutListener(api_key, api_secret, access_token, access_token_secret)
 l.filter(track=["#cat"], filter_level="low")
